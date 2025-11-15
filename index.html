@@ -1,233 +1,461 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>미디어 창의실 예약사이트</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f3f4f6;
-      color: #111827;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      min-height: 100vh;
-      align-items: center;
-      justify-content: center;
-    }
-    .card {
-      background: #ffffff;
-      padding: 24px 28px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      width: 100%;
-      max-width: 480px;
-    }
-    h1 {
-      font-size: 1.4rem;
-      margin: 0 0 4px;
-    }
-    .subtitle {
-      font-size: 0.85rem;
-      color: #6b7280;
-      margin-bottom: 16px;
-    }
-    .field {
-      margin-bottom: 12px;
-    }
-    .field label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .field input,
-    .field select {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .field input:focus,
-    .field select:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 1px rgba(37,99,235,0.2);
-    }
-    .help {
-      font-size: 0.75rem;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
-    .row {
-      display: flex;
-      gap: 8px;
-    }
-    .row .field {
-      flex: 1;
-    }
-    button {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: none;
-      font-size: 0.95rem;
-      font-weight: 600;
-      background: #2563eb;
-      color: white;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background 0.15s, transform 0.05s;
-    }
-    button:hover {
-      background: #1d4ed8;
-    }
-    button:active {
-      transform: translateY(1px);
-    }
-    button[disabled] {
-      opacity: 0.6;
-      cursor: default;
-      transform: none;
-    }
-    .status {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      min-height: 1.2em;
-    }
-    .status.success {
-      color: #16a34a;
-    }
-    .status.error {
-      color: #dc2626;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>미디어 창의실 예약</h1>
-    <div class="subtitle">
-      이름 · 학번 · 날짜 · 시간을 선택하면 n8n으로 바로 전송됩니다.
+<html class="light" lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>미디어 창의실 예약</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              display: ["Lexend", "Noto Sans KR", "system-ui", "sans-serif"],
+              sans: ["Noto Sans KR", "system-ui", "sans-serif"],
+            },
+            colors: {
+              primary: {
+                DEFAULT: "#2563eb",
+                soft: "#dbeafe",
+              },
+              background: {
+                light: "#f3f4f6",
+                dark: "#020617",
+              },
+              card: {
+                light: "#ffffff",
+                dark: "#020617",
+              },
+              border: "#e5e7eb",
+              text: {
+                light: "#111827",
+                dark: "#e5e7eb",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 500,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark"
+  >
+    <div
+      class="relative flex min-h-screen w-full flex-col items-center justify-center p-4 sm:p-6 lg:p-8"
+    >
+      <div class="w-full max-w-2xl">
+        <!-- Header -->
+        <header
+          class="mb-6 flex items-center justify-between rounded-2xl border border-border bg-card-light/80 p-4 shadow-sm backdrop-blur dark:bg-card-dark/80"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-soft text-primary"
+            >
+              <span class="material-symbols-outlined"> gallery_thumbnail </span>
+            </div>
+            <div>
+              <h1 class="text-lg font-semibold leading-tight">
+                미디어 창의실 예약
+              </h1>
+              <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                이름·학번·날짜·시간을 선택하면 n8n으로 바로 전송됩니다.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="hidden items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-[11px] font-medium text-gray-600 dark:bg-slate-800 dark:text-gray-300 sm:flex"
+          >
+            <span
+              class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px] shadow-sm dark:bg-slate-900"
+              >●</span
+            >
+            실시간 예약 시스템
+          </div>
+        </header>
+
+        <!-- Card -->
+        <main
+          class="rounded-2xl border border-border bg-card-light/90 p-5 shadow-lg shadow-slate-900/5 backdrop-blur-md dark:bg-card-dark/90"
+        >
+          <!-- Status banner -->
+          <div
+            id="status-banner"
+            class="mb-4 hidden items-start gap-3 rounded-xl border px-3.5 py-2.5 text-sm"
+          >
+            <div
+              id="status-icon"
+              class="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full"
+            >
+              <span class="material-symbols-outlined text-[18px]">
+                info
+              </span>
+            </div>
+            <div class="flex-1">
+              <p
+                id="status-message"
+                class="font-medium text-gray-800 dark:text-gray-100"
+              ></p>
+              <p
+                id="status-sub"
+                class="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
+              ></p>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <form id="reservation-form" class="space-y-8">
+            <div class="grid grid-cols-1 gap-x-6 gap-y-6 md:grid-cols-2">
+              <!-- Name -->
+              <div class="flex flex-col">
+                <label
+                  for="name"
+                  class="pb-2 text-sm font-medium leading-normal text-gray-800 dark:text-gray-100"
+                  >이름 (Name)</label
+                >
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  placeholder="이름을 입력하세요"
+                  class="form-input flex w-full min-w-0 flex-1 rounded-xl border-gray-300 bg-white text-sm shadow-sm outline-none ring-primary-soft placeholder:text-gray-400 focus:border-primary focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100"
+                />
+              </div>
+
+              <!-- Student ID -->
+              <div class="flex flex-col">
+                <label
+                  for="student-id"
+                  class="pb-2 text-sm font-medium leading-normal text-gray-800 dark:text-gray-100"
+                  >학번 (Student ID)</label
+                >
+                <input
+                  id="student-id"
+                  name="student-id"
+                  type="text"
+                  required
+                  placeholder="예: 1416"
+                  class="form-input flex w-full min-w-0 flex-1 rounded-xl border-gray-300 bg-white text-sm shadow-sm outline-none ring-primary-soft placeholder:text-gray-400 focus:border-primary focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100"
+                />
+                <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  학번 4자리 정도 형식으로 입력해주세요.
+                </p>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="flex flex-col">
+              <label
+                for="email"
+                class="pb-2 text-sm font-medium leading-normal text-gray-800 dark:text-gray-100"
+                >이메일 (Email)</label
+              >
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="학교 이메일을 입력하세요"
+                class="form-input flex w-full min-w-0 flex-1 rounded-xl border-gray-300 bg-white text-sm shadow-sm outline-none ring-primary-soft placeholder:text-gray-400 focus:border-primary focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100"
+              />
+              <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                예약 결과가 이 주소로 전송됩니다.
+              </p>
+            </div>
+
+            <!-- Date -->
+            <div class="flex flex-col">
+              <label
+                for="date"
+                class="pb-2 text-sm font-medium leading-normal text-gray-800 dark:text-gray-100"
+                >날짜 (Date)</label
+              >
+              <div class="relative">
+                <input
+                  id="date"
+                  name="date"
+                  type="date"
+                  required
+                  class="form-input flex w-full min-w-0 flex-1 rounded-xl border-gray-300 bg-white text-sm shadow-sm outline-none ring-primary-soft placeholder:text-gray-400 focus:border-primary focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100"
+                />
+                <span
+                  class="pointer-events-none absolute inset-y-0 right-3 inline-flex items-center justify-center text-gray-400"
+                >
+                  <span class="material-symbols-outlined text-[18px]">
+                    calendar_today
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Room & Time -->
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <!-- Room radio -->
+              <fieldset>
+                <legend
+                  class="mb-2 text-sm font-medium text-gray-800 dark:text-gray-100"
+                >
+                  창의실 (Room)
+                </legend>
+                <div class="space-y-2 rounded-xl bg-gray-50 p-3 dark:bg-slate-900">
+                  <label
+                    class="flex cursor-pointer items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-white hover:shadow-sm dark:hover:bg-slate-800"
+                  >
+                    <div class="flex items-center gap-2">
+                      <input
+                        id="room1"
+                        name="creative-room"
+                        type="radio"
+                        value="1실"
+                        class="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                        checked
+                      />
+                      <span class="font-medium">1실</span>
+                    </div>
+                    <span
+                      class="rounded-full bg-primary-soft px-2 py-0.5 text-[11px] font-medium text-primary"
+                      >추천</span
+                    >
+                  </label>
+
+                  <label
+                    class="flex cursor-pointer items-center rounded-lg px-2 py-2 text-sm hover:bg-white hover:shadow-sm dark:hover:bg-slate-800"
+                  >
+                    <input
+                      id="room2"
+                      name="creative-room"
+                      type="radio"
+                      value="2실"
+                      class="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <span class="ml-2 font-medium">2실</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <!-- Time select -->
+              <div class="flex flex-col">
+                <label
+                  for="time"
+                  class="pb-2 text-sm font-medium leading-normal text-gray-800 dark:text-gray-100"
+                  >시간 (Time)</label
+                >
+                <select
+                  id="time"
+                  name="time"
+                  required
+                  class="form-select rounded-xl border-gray-300 bg-white text-sm shadow-sm outline-none ring-primary-soft focus:border-primary focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-100"
+                >
+                  <option value="">시간을 선택하세요</option>
+                  <option value="자습1교시">자습 1교시</option>
+                  <option value="자습2교시">자습 2교시</option>
+                  <option value="야자1교시">야자 1교시</option>
+                  <option value="야자2교시">야자 2교시</option>
+                </select>
+                <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                  이미 예약된 시간은 n8n에서 자동으로 막아줍니다.
+                </p>
+              </div>
+            </div>
+
+            <!-- Summary -->
+            <div
+              class="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-3.5 py-3 text-xs text-gray-600 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-300"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[12px] shadow-sm dark:bg-slate-800"
+                  >
+                    i
+                  </span>
+                  <p>
+                    위 정보는
+                    <span class="font-semibold">n8n 예약 워크플로우</span>로
+                    전송됩니다.
+                  </p>
+                </div>
+                <span class="hidden text-[11px] text-gray-400 sm:inline">
+                  저장: DataTable “미디어 창의실”
+                </span>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <button
+              type="submit"
+              id="submit-btn"
+              class="flex w-full items-center justify-center rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary/30 transition hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 dark:ring-offset-slate-900"
+            >
+              <span class="material-symbols-outlined mr-1.5 text-[18px]">
+                send
+              </span>
+              예약 신청 (Submit)
+            </button>
+          </form>
+        </main>
+      </div>
     </div>
 
-    <form id="reservation-form">
-      <div class="field">
-        <label for="name">이름</label>
-        <input id="name" name="name" type="text" required />
-      </div>
+    <script>
+      // TODO: 여기를 실제 n8n Webhook URL로 교체
+      // 예: "https://naplace-n8n.org/webhook/9eb4ab1b-25d4-445b-bdc1-ed7a9bf07d3a"
+      const N8N_WEBHOOK_URL =
+        "https://YOUR_N8N_DOMAIN/webhook/9eb4ab1b-25d4-445b-bdc1-ed7a9bf07d3a";
 
-      <div class="field">
-        <label for="student-id">학번</label>
-        <input id="student-id" name="student-id" type="text" placeholder="예: 1416" required />
-      </div>
+      const form = document.getElementById("reservation-form");
+      const submitBtn = document.getElementById("submit-btn");
+      const statusBanner = document.getElementById("status-banner");
+      const statusMsg = document.getElementById("status-message");
+      const statusSub = document.getElementById("status-sub");
+      const statusIcon = document.getElementById("status-icon");
 
-      <div class="field">
-        <label for="email">이메일</label>
-        <input id="email" name="email" type="email" placeholder="school@gbs.hs.kr" required />
-        <div class="help">예약 결과가 이 주소로 발송됩니다.</div>
-      </div>
+      function showStatus(type, message, sub) {
+        statusBanner.classList.remove("hidden");
+        statusBanner.classList.remove(
+          "border-blue-200",
+          "bg-blue-50",
+          "border-green-200",
+          "bg-green-50",
+          "border-red-200",
+          "bg-red-50"
+        );
+        statusIcon.classList.remove(
+          "bg-blue-100",
+          "text-blue-600",
+          "bg-green-100",
+          "text-green-600",
+          "bg-red-100",
+          "text-red-600"
+        );
 
-      <div class="field">
-        <label for="date">날짜</label>
-        <input id="date" name="date" type="date" required />
-      </div>
-
-      <div class="row">
-        <div class="field">
-          <label for="creative-room">창의실</label>
-          <select id="creative-room" name="creative-room" required>
-            <option value="">선택하세요</option>
-            <option value="1실">1실</option>
-            <option value="2실">2실</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="time">시간</label>
-          <select id="time" name="time" required>
-            <option value="">선택하세요</option>
-            <option value="자습1교시">자습1교시</option>
-            <option value="자습2교시">자습2교시</option>
-            <option value="야자1교시">야자1교시</option>
-            <option value="야자2교시">야자2교시</option>
-          </select>
-        </div>
-      </div>
-
-      <button type="submit">예약 신청</button>
-      <div id="status" class="status"></div>
-    </form>
-  </div>
-
-  <script>
-    // TODO: 여기를 실제 n8n 도메인에 맞게 수정
-    const N8N_WEBHOOK_URL =
-      "https://n8n.taetae.dev/webhook/9eb4ab1b-25d4-445b-bdc1-ed7a9bf07d3a";
-
-    const form = document.getElementById("reservation-form");
-    const statusEl = document.getElementById("status");
-    const button = form.querySelector("button[type='submit']");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      statusEl.textContent = "";
-      statusEl.className = "status";
-
-      const formData = new FormData(form);
-
-      const payload = {
-        // n8n Map frontend data 노드에서 사용하는 키 이름
-        name: formData.get("name")?.trim(),
-        "student-id": formData.get("student-id")?.trim(),
-        email: formData.get("email")?.trim(),
-        date: formData.get("date"),
-        "creative-room": formData.get("creative-room"),
-        time: formData.get("time")
-      };
-
-      // 간단 유효성 체크
-      if (!payload.name || !payload["student-id"] || !payload.email ||
-          !payload.date || !payload["creative-room"] || !payload.time) {
-        statusEl.textContent = "모든 항목을 입력해주세요.";
-        statusEl.classList.add("error");
-        return;
-      }
-
-      button.disabled = true;
-      button.textContent = "전송 중...";
-      try {
-        const res = await fetch(N8N_WEBHOOK_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) {
-          throw new Error("HTTP " + res.status);
+        if (type === "info") {
+          statusBanner.classList.add("border-blue-200", "bg-blue-50");
+          statusIcon.classList.add("bg-blue-100", "text-blue-600");
+        } else if (type === "success") {
+          statusBanner.classList.add("border-green-200", "bg-green-50");
+          statusIcon.classList.add("bg-green-100", "text-green-600");
+        } else if (type === "error") {
+          statusBanner.classList.add("border-red-200", "bg-red-50");
+          statusIcon.classList.add("bg-red-100", "text-red-600");
         }
 
-        statusEl.textContent =
-          "요청이 전송되었습니다. 이메일을 확인해주세요.";
-        statusEl.classList.add("success");
-        form.reset();
-      } catch (err) {
-        console.error(err);
-        statusEl.textContent =
-          "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
-        statusEl.classList.add("error");
-      } finally {
-        button.disabled = false;
-        button.textContent = "예약 신청";
+        statusMsg.textContent = message;
+        statusSub.textContent = sub || "";
       }
-    });
-  </script>
-</body>
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const payload = {
+          name: formData.get("name")?.trim(),
+          "student-id": formData.get("student-id")?.trim(),
+          email: formData.get("email")?.trim(),
+          date: formData.get("date"),
+          "creative-room": formData.get("creative-room"),
+          time: formData.get("time"),
+        };
+
+        // 간단 검증
+        if (
+          !payload.name ||
+          !payload["student-id"] ||
+          !payload.email ||
+          !payload.date ||
+          !payload["creative-room"] ||
+          !payload.time
+        ) {
+          showStatus(
+            "error",
+            "모든 필드를 정확히 입력해주세요.",
+            "이름, 학번, 이메일, 날짜, 창의실, 시간 중 누락된 값이 있습니다."
+          );
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-80", "cursor-wait");
+        submitBtn.innerHTML =
+          '<span class="material-symbols-outlined mr-1.5 text-[18px] animate-spin"> progress_activity </span> 전송 중...';
+
+        showStatus(
+          "info",
+          "예약 요청을 전송하는 중입니다.",
+          "잠시만 기다려 주세요. n8n에서 중복 여부를 확인한 뒤 이메일을 발송합니다."
+        );
+
+        try {
+          const res = await fetch(N8N_WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            throw new Error("HTTP " + res.status);
+          }
+
+          showStatus(
+            "success",
+            "예약 요청이 정상적으로 전송되었습니다.",
+            "곧 학교 이메일로 예약 성공 또는 중복 안내 메일이 도착합니다."
+          );
+          form.reset();
+        } catch (err) {
+          console.error(err);
+          showStatus(
+            "error",
+            "전송 중 오류가 발생했습니다.",
+            "네트워크 상태를 확인하거나, 잠시 후 다시 시도해주세요."
+          );
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-80", "cursor-wait");
+          submitBtn.innerHTML =
+            '<span class="material-symbols-outlined mr-1.5 text-[18px]"> send </span>예약 신청 (Submit)';
+        }
+      });
+    </script>
+  </body>
 </html>
