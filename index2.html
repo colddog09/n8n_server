@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>미디어 창의실 예약</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #ffffff;
+      padding: 24px 28px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 480px;
+    }
+    h1 {
+      font-size: 1.4rem;
+      margin: 0 0 4px;
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+    .field {
+      margin-bottom: 12px;
+    }
+    .field label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .field input:focus,
+    .field select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.2);
+    }
+    .help {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+    }
+    .row .field {
+      flex: 1;
+    }
+    button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.15s, transform 0.05s;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    button[disabled] {
+      opacity: 0.6;
+      cursor: default;
+      transform: none;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+    }
+    .status.success {
+      color: #16a34a;
+    }
+    .status.error {
+      color: #dc2626;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>미디어 창의실 예약</h1>
+    <div class="subtitle">
+      이름 · 학번 · 날짜 · 시간을 선택하면 n8n으로 바로 전송됩니다.
+    </div>
+
+    <form id="reservation-form">
+      <div class="field">
+        <label for="name">이름</label>
+        <input id="name" name="name" type="text" required />
+      </div>
+
+      <div class="field">
+        <label for="student-id">학번</label>
+        <input id="student-id" name="student-id" type="text" placeholder="예: 1416" required />
+      </div>
+
+      <div class="field">
+        <label for="email">이메일</label>
+        <input id="email" name="email" type="email" placeholder="school@gbs.hs.kr" required />
+        <div class="help">예약 결과가 이 주소로 발송됩니다.</div>
+      </div>
+
+      <div class="field">
+        <label for="date">날짜</label>
+        <input id="date" name="date" type="date" required />
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="creative-room">창의실</label>
+          <select id="creative-room" name="creative-room" required>
+            <option value="">선택하세요</option>
+            <option value="1실">1실</option>
+            <option value="2실">2실</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="time">시간</label>
+          <select id="time" name="time" required>
+            <option value="">선택하세요</option>
+            <option value="자습1교시">자습1교시</option>
+            <option value="자습2교시">자습2교시</option>
+            <option value="야자1교시">야자1교시</option>
+            <option value="야자2교시">야자2교시</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit">예약 신청</button>
+      <div id="status" class="status"></div>
+    </form>
+  </div>
+
+  <script>
+    // TODO: 여기를 실제 n8n 도메인에 맞게 수정
+    const N8N_WEBHOOK_URL =
+      "https://n8n.taetae.dev/webhook/9eb4ab1b-25d4-445b-bdc1-ed7a9bf07d3a";
+
+    const form = document.getElementById("reservation-form");
+    const statusEl = document.getElementById("status");
+    const button = form.querySelector("button[type='submit']");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusEl.textContent = "";
+      statusEl.className = "status";
+
+      const formData = new FormData(form);
+
+      const payload = {
+        // n8n Map frontend data 노드에서 사용하는 키 이름
+        name: formData.get("name")?.trim(),
+        "student-id": formData.get("student-id")?.trim(),
+        email: formData.get("email")?.trim(),
+        date: formData.get("date"),
+        "creative-room": formData.get("creative-room"),
+        time: formData.get("time")
+      };
+
+      // 간단 유효성 체크
+      if (!payload.name || !payload["student-id"] || !payload.email ||
+          !payload.date || !payload["creative-room"] || !payload.time) {
+        statusEl.textContent = "모든 항목을 입력해주세요.";
+        statusEl.classList.add("error");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "전송 중...";
+      try {
+        const res = await fetch(N8N_WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+
+        statusEl.textContent =
+          "요청이 전송되었습니다. 이메일을 확인해주세요.";
+        statusEl.classList.add("success");
+        form.reset();
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent =
+          "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        statusEl.classList.add("error");
+      } finally {
+        button.disabled = false;
+        button.textContent = "예약 신청";
+      }
+    });
+  </script>
+</body>
+</html>
