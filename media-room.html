@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미디어 창의실 예약</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="header-nav">
+                <a href="index.html" class="home-btn">🏠 홈으로</a>
+            </div>
+            <div class="logo">
+                <span class="icon">✨</span>
+                <h1>Media Creative Room</h1>
+            </div>
+            <p class="subtitle">미디어 창의실 예약 시스템</p>
+        </header>
+
+        <main>
+            <section class="reservation-card glass-panel">
+                <h2>예약 현황</h2>
+                <div class="dashboard-actions">
+                    <a href="https://forms.gle/EdNvXN7qPbtEcKnc7" target="_blank" class="btn-primary link-btn">
+                        <span>📅 예약하러 가기</span>
+                    </a>
+                    <button id="refreshBtn" class="btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M23 4v6h-6"></path>
+                            <path d="M1 20v-6h6"></path>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table id="reservationTable">
+                        <thead>
+                            <tr>
+                                <th>창의실</th>
+                                <th>날짜</th>
+                                <th>시간</th>
+                                <th>학번</th>
+                                <th>이름</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservationList">
+                            <tr>
+                                <td colspan="4" class="loading-text">데이터를 불러오는 중...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="chat-card glass-panel">
+                <div class="chat-header">
+                    <h2>AI Assistant</h2>
+                    <span class="status-dot"></span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot">
+                        <div class="message-content">
+                            안녕하세요! 미디어 창의실 예약 관련해서 궁금한 점이 있으신가요? 날짜별 예약 현황을 물어보세요!
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="예: 8월 11일 예약 알려줘">
+                    <button id="sendBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="toast" class="toast hidden">예약이 완료되었습니다!</div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

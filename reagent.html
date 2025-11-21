@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reagent Assistant</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            font-family: "Pretendard Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --bg-gradient: radial-gradient(circle at top left, #f8fbff, #e6ecf8);
+            --shadow-soft: 0 24px 60px rgba(55, 76, 130, 0.12);
+            --card-bg: rgba(255, 255, 255, 0.82);
+            --accent: #3b82f6;
+            --accent-strong: #1d4ed8;
+            --border: rgba(15, 35, 75, 0.1);
+            --text: #0f2443;
+            --muted: rgba(15, 36, 67, 0.6);
+            --bot-bg: rgba(255, 255, 255, 0.92);
+            --user-bg: linear-gradient(135deg, #2563eb, #60a5fa);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-gradient: radial-gradient(circle at top left, #0b1220, #131c31);
+                --card-bg: rgba(19, 28, 49, 0.75);
+                --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.45);
+                --border: rgba(148, 163, 184, 0.28);
+                --text: #e4ecff;
+                --muted: rgba(226, 232, 240, 0.7);
+                --bot-bg: rgba(21, 31, 52, 0.92);
+                --user-bg: linear-gradient(135deg, #4c8dff, #6ea8ff);
+            }
+
+            body {
+                color: var(--text);
+            }
+
+            textarea {
+                background: rgba(10, 15, 28, 0.85) !important;
+                border-color: rgba(148, 163, 184, 0.35) !important;
+                color: #e4ecff !important;
+                caret-color: rgba(148, 197, 255, 0.95);
+            }
+
+            textarea:focus {
+                border-color: rgba(96, 165, 250, 0.65) !important;
+                box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.22) !important;
+            }
+
+            textarea::placeholder {
+                color: rgba(226, 232, 240, 0.7) !important;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            display: flex;
+            justify-content: center;
+            color: var(--text);
+        }
+
+        .app {
+            width: min(960px, 92vw);
+            margin: 3vh 0 4vh;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(24px);
+            background: var(--card-bg);
+            border-radius: 28px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.75rem;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 35, 75, 0.08);
+            backdrop-filter: blur(18px);
+        }
+
+        header .title-group h1 {
+            margin: 0;
+            font-size: 1.35rem;
+            letter-spacing: -0.01em;
+            font-weight: 700;
+        }
+
+        header .title-group p {
+            margin: 0.25rem 0 0;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .badge {
+            padding: 0.45rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--accent-strong);
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            padding: 1.75rem;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding-right: 0.35rem;
+        }
+
+        #messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #messages::-webkit-scrollbar-thumb {
+            background: rgba(30, 64, 175, 0.25);
+            border-radius: 999px;
+        }
+
+        .message {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem 0.9rem;
+            align-items: start;
+            animation: fadeUp 0.25s ease-out forwards;
+        }
+
+        .message .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: grid;
+            place-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: rgba(59, 130, 246, 0.14);
+            color: var(--accent-strong);
+        }
+
+        .message.user .avatar {
+            background: rgba(79, 70, 229, 0.14);
+            color: rgba(79, 70, 229, 0.95);
+        }
+
+        .message .bubble {
+            position: relative;
+            padding: 1rem 1.15rem;
+            border-radius: 18px;
+            background: var(--bot-bg);
+            border: 1px solid rgba(15, 35, 75, 0.08);
+            box-shadow: 0 14px 35px rgba(14, 28, 62, 0.08);
+            line-height: 1.55;
+        }
+
+        .message.user .bubble {
+            background: var(--user-bg);
+            border: none;
+            color: white;
+            box-shadow: 0 18px 36px rgba(24, 43, 109, 0.28);
+        }
+
+        .bubble .meta {
+            font-size: 0.75rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--muted);
+        }
+
+        .message.user .bubble .meta {
+            color: rgba(226, 232, 240, 0.75);
+        }
+
+        .bubble .body {
+            font-size: 0.98rem;
+            white-space: pre-line;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .controls .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+
+        .controls .status span {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 1.1s infinite ease-in-out;
+        }
+
+        .controls .status:not(.show) {
+            visibility: hidden;
+        }
+
+        form {
+            display: flex;
+            gap: 0.9rem;
+            padding: 1.25rem 1.75rem 1.75rem;
+            border-top: 1px solid var(--border);
+            background: rgba(15, 35, 75, 0.06);
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 110px;
+            padding: 1rem 1.1rem;
+            border-radius: 18px;
+            border: 1px solid rgba(30, 64, 108, 0.16);
+            resize: vertical;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.96) !important;
+            color: #0f2443 !important;
+            line-height: 1.5;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+            caret-color: var(--accent);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.65);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+        }
+
+        textarea::placeholder {
+            color: rgba(16, 42, 67, 0.45);
+        }
+
+        button {
+            padding: 0.95rem 1.6rem;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 20px 35px rgba(37, 99, 235, 0.28);
+            transition: transform 0.15s ease, box-shadow 0.18s ease, opacity 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        button:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 24px 38px rgba(37, 99, 235, 0.35);
+        }
+
+        .ghost-button {
+            padding: 0.6rem 0.9rem;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: transparent;
+            color: var(--text);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+
+        .ghost-button:hover {
+            border-color: rgba(59, 130, 246, 0.65);
+            color: var(--accent-strong);
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        footer {
+            padding: 1rem 1.75rem 1.5rem;
+            font-size: 0.8rem;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            background: rgba(15, 35, 75, 0.04);
+        }
+
+        code {
+            padding: 0.1rem 0.35rem;
+            background: rgba(15, 23, 42, 0.08);
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .app {
+                width: 96vw;
+                margin: 1.5vh 0 2vh;
+                border-radius: 20px;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            form {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(0.92);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.12);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <header>
+            <div class="title-group">
+                <h1>Reagent Inventory Copilot</h1>
+                <p>Chat-driven assistant for managing the life science reagent catalog.</p>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" class="ghost-button" style="text-decoration: none;">🏠 Home</a>
+                <span class="badge" id="session-badge">Session: —</span>
+                <button class="ghost-button" id="reset-btn" type="button">Start fresh</button>
+            </div>
+        </header>
+        <main>
+            <section id="messages" aria-live="polite"></section>
+            <div class="controls">
+                <span id="hint">Enter to send • Shift + Enter for line break</span>
+                <div class="status" id="status"><span></span>Talking to n8n…</div>
+            </div>
+        </main>
+        <form id="chat-form">
+            <textarea id="chat-input" placeholder="Describe what you need help with… (e.g. “신규 시약 A-101 재고 등록해 줘”)"
+                required></textarea>
+            <button type="submit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                    <path d="M5 12h14" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="m12 5 7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                Send
+            </button>
+        </form>
+        <footer>
+            Clients post to <code>https://n8n.taetae.dev/webhook/reagent-manager</code>. Adjust <code>WEBHOOK_URL</code>
+            in
+            this file if your n8n instance lives elsewhere.
+        </footer>
+    </div>
+    <script>
+        const WEBHOOK_URL = window.WEBHOOK_URL || 'https://n8n.taetae.dev/webhook/reagent-manager';
+        const SESSION_STORAGE_KEY = 'reagent-session-id';
+        const generateSessionId = () =>
+            typeof crypto !== 'undefined' && crypto.randomUUID
+                ? crypto.randomUUID()
+                : `session-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+        let sessionId = window.localStorage.getItem(SESSION_STORAGE_KEY);
+        if (!sessionId) {
+            sessionId = generateSessionId();
+            window.localStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+        }
+
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('chat-input');
+        const messages = document.getElementById('messages');
+        const status = document.getElementById('status');
+        const sessionBadge = document.getElementById('session-badge');
+        const resetBtn = document.getElementById('reset-btn');
+
+        function updateSessionBadge() {
+            const suffix = sessionId.slice(-6).toUpperCase();
+            sessionBadge.textContent = `Session: ${suffix}`;
+        }
+
+        function formatTimestamp(date = new Date()) {
+            const hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const suffix = hours >= 12 ? 'PM' : 'AM';
+            const normalized = hours % 12 || 12;
+            return `${normalized}:${minutes} ${suffix}`;
+        }
+
+        function appendMessage(role, content, opts = {}) {
+            const article = document.createElement('article');
+            article.className = `message ${role}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = role === 'user' ? 'You' : 'AI';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+
+            const meta = document.createElement('div');
+            meta.className = 'meta';
+            meta.textContent = `${role === 'user' ? 'You' : 'Assistant'} • ${formatTimestamp(opts.timestamp)}`;
+
+            const body = document.createElement('div');
+            body.className = 'body';
+            const lines = String(content ?? '').split(/\n/);
+            lines.forEach((line, index) => {
+                if (index) body.appendChild(document.createElement('br'));
+                body.appendChild(document.createTextNode(line));
+            });
+
+            bubble.append(meta, body);
+            article.append(avatar, bubble);
+            messages.appendChild(article);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        async function sendMessage(evt) {
+            evt.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+            appendMessage('user', text);
+            input.value = '';
+            input.focus();
+            form.querySelector('button').disabled = true;
+            status.classList.add('show');
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, sessionId })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Request failed (${response.status})`);
+                }
+
+                const payload = await response.json();
+                const reply = payload?.message ?? JSON.stringify(payload, null, 2);
+                appendMessage('bot', reply);
+            } catch (error) {
+                console.error(error);
+                appendMessage('bot', `⚠️ ${error.message}`);
+            } finally {
+                status.classList.remove('show');
+                form.querySelector('button').disabled = false;
+            }
+        }
+
+        function resetConversation() {
+            messages.innerHTML = '';
+            sessionId = generateSessionId();
+            window.localStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+            updateSessionBadge();
+            appendMessage(
+                'bot',
+                '안녕하세요! 시약 재고를 조회하거나 추가하고 싶다면 내용을 자유롭게 입력해 주세요. 필요한 단계는 제가 체크리스트로 안내해 드릴게요.',
+                { timestamp: new Date() }
+            );
+        }
+
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                form.requestSubmit();
+            }
+        });
+
+        form.addEventListener('submit', sendMessage);
+        resetBtn.addEventListener('click', resetConversation);
+        updateSessionBadge();
+        appendMessage(
+            'bot',
+            '안녕하세요! 시약 재고를 조회하거나 추가하고 싶다면 내용을 자유롭게 입력해 주세요. 필요한 단계는 제가 체크리스트로 안내해 드릴게요.',
+            { timestamp: new Date() }
+        );
+    </script>
+</body>
+
+</html>
