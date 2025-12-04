@@ -5,12 +5,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>경기북과학고 편의 사이트</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
+        :root {
+            --primary: #3b82f6;
+            --text-light: #f8fafc;
+            --text-gray: #94a3b8;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #0f172a;
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        .background-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 10s infinite ease-in-out;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: #8b5cf6;
+            top: -100px;
+            left: -100px;
+        }
+
+        .blob-2 {
+            width: 300px;
+            height: 300px;
+            background: #3b82f6;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: 2s;
+        }
+
+        .blob-3 {
+            width: 250px;
+            height: 250px;
+            background: #ec4899;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(30px, -30px);
+            }
+        }
+
         .hub-container {
             display: flex;
             flex-direction: column;
@@ -41,7 +119,8 @@
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px;
+            /* Increased max-width for 3 cards */
         }
 
         .service-card {
@@ -88,6 +167,34 @@
             font-size: 1rem;
             line-height: 1.5;
         }
+
+        /* Login Section Styles */
+        #loginSection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            z-index: 10;
+            position: relative;
+        }
+
+        #hubContent {
+            display: none;
+            /* Hidden by default */
+            width: 100%;
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
     </style>
 </head>
 
@@ -98,26 +205,98 @@
         <div class="blob blob-3"></div>
     </div>
 
-    <div class="hub-container">
-        <header class="hub-header">
-            <h1>경기북과학고 편의 사이트</h1>
-            <p>학교 생활을 더 편리하게 만들어주는 도구 모음</p>
-        </header>
+    <!-- Login Section -->
+    <div id="loginSection">
+        <div class="login-card">
+            <h1 style="margin-bottom: 1rem; font-size: 2rem;">환영합니다</h1>
+            <p style="color: var(--text-gray); margin-bottom: 2rem;">경기북과학고 편의 사이트 이용을 위해<br>구글 계정으로 로그인해주세요.</p>
 
-        <div class="card-grid">
-            <a href="media-room.html" class="service-card">
-                <div class="icon-wrapper">🎬</div>
-                <h2>미디어 창의실 예약</h2>
-                <p>창의실 예약 현황을 확인하고<br>간편하게 신청하세요.</p>
-            </a>
+            <!-- Google Login Button Container -->
+            <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID" data-callback="handleCredentialResponse"
+                data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"
+                data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left">
+            </div>
 
-            <a href="reagent.html" class="service-card">
-                <div class="icon-wrapper">🧪</div>
-                <h2>시약 관리 도우미</h2>
-                <p>AI와 대화하며 시약 재고를<br>조회하고 관리하세요.</p>
-            </a>
+            <!-- Dev Bypass Button (Remove in Production) -->
+            <button onclick="bypassLogin()"
+                style="margin-top: 20px; background: transparent; border: 1px dashed #666; color: #666; padding: 5px 10px; cursor: pointer; font-size: 0.8rem;">
+                [개발용] 로그인 건너뛰기
+            </button>
         </div>
     </div>
+
+    <!-- Hub Content (Hidden until login) -->
+    <div id="hubContent">
+        <div class="hub-container">
+            <header class="hub-header">
+                <h1>경기북과학고 편의 사이트</h1>
+                <p>학교 생활을 더 편리하게 만들어주는 도구 모음</p>
+                <div id="userInfo" style="margin-top: 1rem; font-size: 0.9rem; color: var(--primary);"></div>
+            </header>
+
+            <div class="card-grid">
+                <!-- New GBS Study Cafe Card -->
+                <a href="study-cafe.html" class="service-card">
+                    <div class="icon-wrapper">📚</div>
+                    <h2>GBS 스터디 카페</h2>
+                    <p>실시간 좌석 현황을 확인하고<br>원하는 자리를 예약하세요.</p>
+                </a>
+
+                <a href="media-room.html" class="service-card">
+                    <div class="icon-wrapper">🎬</div>
+                    <h2>미디어 창의실 예약</h2>
+                    <p>창의실 예약 현황을 확인하고<br>간편하게 신청하세요.</p>
+                </a>
+
+                <a href="reagent.html" class="service-card">
+                    <div class="icon-wrapper">🧪</div>
+                    <h2>시약 관리 도우미</h2>
+                    <p>AI와 대화하며 시약 재고를<br>조회하고 관리하세요.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleCredentialResponse(response) {
+            // Decode JWT to get user info (simplified for demo)
+            const responsePayload = decodeJwtResponse(response.credential);
+
+            console.log("ID: " + responsePayload.sub);
+            console.log('Full Name: ' + responsePayload.name);
+            console.log('Given Name: ' + responsePayload.given_name);
+            console.log('Family Name: ' + responsePayload.family_name);
+            console.log("Image URL: " + responsePayload.picture);
+            console.log("Email: " + responsePayload.email);
+
+            showHub(responsePayload.name);
+        }
+
+        function decodeJwtResponse(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            return JSON.parse(jsonPayload);
+        }
+
+        function showHub(userName) {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('hubContent').style.display = 'block';
+
+            if (userName) {
+                document.getElementById('userInfo').textContent = `${userName}님 환영합니다!`;
+            }
+        }
+
+        function bypassLogin() {
+            showHub("게스트");
+        }
+    </script>
 </body>
 
 </html>
